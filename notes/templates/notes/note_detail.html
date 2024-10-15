@@ -1,0 +1,31 @@
+<!-- notes/templates/notes/note_detail.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ note.title }}</title>
+</head>
+<body>
+    <h1>{{ note.title }}</h1>
+    <textarea id="note-content" rows="10" cols="50">{{ note.content }}</textarea>
+
+    <script>
+        // Establish WebSocket connection to the server
+        const noteId = "{{ note.id }}";
+        const socket = new WebSocket('ws://' + window.location.host + '/ws/notes/' + noteId + '/');
+
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            document.getElementById('note-content').value = data.message;
+        };
+
+        document.getElementById('note-content').addEventListener('input', function(e) {
+            const message = e.target.value;
+            socket.send(JSON.stringify({
+                'message': message
+            }));
+        });
+    </script>
+</body>
+</html>
